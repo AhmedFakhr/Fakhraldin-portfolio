@@ -1,0 +1,206 @@
+What i need to do before deploying the database in the new pod 
+
+
+1-Presistant Storage 
+Can do while running: You can modify the persistent volume claim (PVC) or switch to a different storage class while the pod is running, though this might require re-deploying the pod depending on your storage setup.
+Check if it’s configured:
+
+Command: Check the persistent volume claim associated with your PostgreSQL pod.
+
+kubectl get pvc
+What to ask:
+
+"Is a Persistent Volume Claim (PVC) configured for the PostgreSQL pod?"
+
+"Is the volume correctly mounted as a persistent storage?"
+
+To verify:
+
+Ensure that the PVC is bound and the data is stored outside of the pod (i.e., it survives pod restarts).
+
+
+2. Database Backup and Restore:
+Can do while running: Backing up the database and restoring it can be done while the database is running. However, ensure you don't perform backups during heavy load periods to avoid performance degradation.
+
+Check if it's automated:
+
+Command: If you are using cron jobs or tools like pgBackRest or WAL-G, check for scheduled backup jobs.
+
+kubectl get cronjobs
+kubectl get pods | grep pgBackRest
+What to ask:
+
+"Is there a scheduled cron job for database backups?"
+
+"Is a backup tool like pgBackRest or WAL-G configured?"
+
+3. PostgreSQL Configuration Management:
+Can do while running: You can apply changes to configuration files by updating the ConfigMap. However, some changes might require restarting the pod or reloading the PostgreSQL service to take effect.
+
+Check if it's managed via ConfigMap:
+
+Command: Look for any ConfigMaps related to PostgreSQL configuration.
+
+kubectl get configmap | grep postgres
+kubectl describe configmap <postgres-configmap-name>
+What to ask:
+
+"Is the PostgreSQL configuration managed via Kubernetes ConfigMap?"
+
+"Are the configuration files like postgresql.conf stored in a ConfigMap?"
+
+To verify:
+
+Look for a ConfigMap named something like postgres-config. You can also check the pod's environment variables to see if the ConfigMap is being used.
+
+4. Database User Management:
+Can do while running: You can create or modify users, change passwords, and manage roles while the database is running. These changes take effect immediately.
+
+Check if admin user is created:
+
+Command: Access the PostgreSQL pod and check users.
+
+kubectl exec -it <postgres-pod-name> -- psql -U postgres -c "\du"
+What to ask:
+
+"Are there specific roles and users configured in PostgreSQL?"
+
+"Is there a dedicated admin user?"
+
+To verify:
+
+The output should show users and roles in PostgreSQL. Ensure that there’s an admin role and proper user setup.
+
+5. Health Checks and Monitoring:
+Can do while running: You can set up liveness/readiness probes, monitoring, and alerting at any time, and these won’t affect the running database.
+
+Check if probes are configured:
+
+Command: Check for liveness and readiness probes in the PostgreSQL deployment.
+
+kubectl describe pod <postgres-pod-name>
+What to ask:
+
+"Are liveness and readiness probes configured for the PostgreSQL pod?"
+
+"Is there monitoring set up, like Prometheus or Grafana?"
+
+To verify:
+
+Look for livenessProbe and readinessProbe fields in the pod description.
+
+For monitoring, check if Prometheus or Grafana are integrated into your cluster.
+
+6. Logging:
+Can do while running: You can configure logging to send logs to centralized systems like ELK or Fluentd without interrupting the running database.
+
+Check if centralized logging is configured:
+
+Command: Look for log management tools like Fluentd or Elasticsearch.
+
+kubectl get pods | grep fluentd
+kubectl get pods | grep elasticsearch
+What to ask:
+
+"Is PostgreSQL logging being captured and stored in a centralized logging system?"
+
+"Are tools like Fluentd or ELK configured for logging?"
+
+To verify:
+
+Check if there are logging agents like Fluentd running in the cluster and if the logs are being stored in Elasticsearch or a similar tool.
+
+7. Pod Affinity and Anti-Affinity:
+Can do while running: You can modify the pod affinity and anti-affinity rules on the fly, though changing these might require pod rescheduling or restarts to take effect.
+
+Check if affinity rules are applied:
+
+Command: Check the pod’s affinity settings in its YAML configuration.
+
+kubectl describe pod <postgres-pod-name> | grep affinity -A 5
+What to ask:
+
+"Are there affinity or anti-affinity rules set for PostgreSQL pods?"
+
+To verify:
+
+Check the pod definition for affinity settings under the spec field. It will ensure that pods are distributed as per the rules you defined.
+
+
+8. Scaling and High Availability:
+Can do while running: If you’re using StatefulSets for high availability, you can scale up/down the pods while the database is running, but some changes to high-availability configurations (like introducing a failover mechanism or adding a new node) may require brief disruptions or pod restarts.
+
+Check if StatefulSets or HA configurations are used:
+
+Command: Check if you're using StatefulSets for PostgreSQL or if any high availability tools (e.g., Patroni, PgBouncer) are configured.
+
+
+kubectl get statefulsets
+kubectl get pods | grep patroni
+kubectl get pods | grep pgbouncer
+What to ask:
+
+"Is PostgreSQL running as a StatefulSet?"
+
+"Is there any high availability mechanism like Patroni configured?"
+
+To verify:
+
+A StatefulSet provides better management of stateful applications. High availability tools like Patroni or PgBouncer should be running in your pod or as separate services.
+
+
+
+9. Resource Management:
+Can do while running: You can modify resource requests and limits while the pod is running, but the changes may not take effect until the pod is restarted. You can use Kubernetes' kubectl to adjust the pod's resources dynamically, but it will only impact the pod after the restart.
+
+Check if resource requests and limits are defined:
+
+Command: Check the resource requests and limits in the pod spec.
+
+kubectl describe pod <postgres-pod-name> | grep -A 10 resources
+What to ask:
+
+"Are resource requests and limits configured for the PostgreSQL pod?"
+
+"Is there adequate resource allocation for memory and CPU?"
+
+To verify:
+
+Ensure that requests and limits are defined for memory and cpu under the resources section in the pod spec.
+
+10. Database Tuning:
+Can do while running: Many configuration changes related to database tuning can be done dynamically with SQL commands (e.g., SET parameters like work_mem or shared_buffers). However, some changes require a database restart to take effect (e.g., modifying postgresql.conf).
+
+Check if parameters are tuned:
+
+Command: Check the current PostgreSQL configuration settings.
+
+kubectl exec -it <postgres-pod-name> -- psql -U postgres -c "SHOW work_mem;"
+kubectl exec -it <postgres-pod-name> -- psql -U postgres -c "SHOW shared_buffers;"
+What to ask:
+
+"Are PostgreSQL parameters such as shared_buffers and work_mem tuned for performance?"
+
+"Are there any custom postgresql.conf settings applied?"
+
+To verify:
+
+Run the SHOW commands to check current configurations. For more advanced checks, review postgresql.conf and check the ConfigMap if it’s being used.
+
+
+
+
+Some commands to help 
+
+kubectl get pv :: This will give the PVC or the storage size assigned to each pod in the system 
+
+kubectl get pods --all-namespaces :: this will list all the pods even if there is a different namespaces 
+
+kubectl describe pod didm-test-beta-postgresql-0 -n didm-test-beta :: this will describe the pod details for example this will list for the test postgresql env 
+
+kubectl get pvc data-didm-test-beta-postgresql-0 -n didm-test-beta :: this will show the storage for the test pod 
+
+kubectl get pv :: this will list the PVC storage for all the ones which we assign a storage size to it 
+
+kubectl describe configmap didm-configmap -n didm-dev :: to describe the configuration map for the pod it will have the connection parameter for example 
+
