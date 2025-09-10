@@ -1,0 +1,128 @@
+.hero {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 2rem;
+  background: linear-gradient(135deg, var(--bg) 0%, var(--bg-alt) 100%);
+  transition: background 0.3s ease;
+
+  .hero-content {
+    max-width: 800px;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeUp 1s ease forwards;
+
+    h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+
+      .highlight {
+        color: var(--accent);
+      }
+    }
+
+    h2 {
+      font-size: 1.8rem;
+      font-weight: 500;
+      margin-bottom: 1.5rem;
+      color: var(--text-muted);
+
+      .typing-text {
+        border-right: 2px solid var(--accent);
+        padding-right: 5px;
+        white-space: nowrap;
+        overflow: hidden;
+        display: inline-block;
+        animation: blink 0.8s step-end infinite;
+      }
+    }
+    /* Cursor blink */
+    @keyframes blink {
+      50% {
+        border-color: transparent;
+      }
+    }
+
+
+    p {
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .hero-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+
+      .btn {
+        padding: 0.8rem 1.5rem;
+        border-radius: 30px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+
+        &.primary {
+          background: var(--accent);
+          color: #fff;
+
+          &:hover {
+            background: var(--accent-hover);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+          }
+        }
+
+        &.secondary {
+          border: 2px solid var(--accent);
+          color: var(--accent);
+
+          &:hover {
+            background: var(--accent);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+          }
+        }
+      }
+    }
+
+    .hero-stats {
+      margin-top: 2.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1rem;
+
+      .stat {
+        background: var(--bg-alt);
+        padding: 0.8rem 1.2rem;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        color: var(--text-muted);
+        transition: all 0.3s ease;
+
+        &:hover {
+          background: var(--accent);
+          color: #fff;
+          transform: translateY(-3px);
+        }
+      }
+    }
+  }
+}
+
+/* Animations */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

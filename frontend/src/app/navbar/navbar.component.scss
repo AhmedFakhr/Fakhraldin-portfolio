@@ -1,0 +1,71 @@
+.navbar {
+  background: var(--bg);
+  color: var(--text);
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+
+  .nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .logo {
+      font-weight: 700;
+      font-size: 1.4rem;
+      text-decoration: none;
+      color: var(--text);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      list-style: none;
+
+      a {
+        text-decoration: none;
+        color: var(--text);
+        font-weight: 500;
+        position: relative;
+
+        &.active {
+          color: var(--accent);
+
+          &::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--accent);
+          }
+        }
+      }
+    }
+
+    .theme-toggle {
+      background: none;
+      border: none;
+      font-size: 1.3rem;
+      cursor: pointer;
+    }
+  }
+}
+
+
+button {
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+body.dark-theme button {
+  color: #fdd835; /* Sun yellow for dark mode */
+}
+
+body:not(.dark-theme) button {
+  color: #3f51b5; /* Moon blue for light mode */
+}
